@@ -6,9 +6,9 @@
 
 ## Instructor
 Elliot Cohen, Ph.D.  
-[QMSS](http://qmss.columbia.edu/faculty-and-staff/) | [Earth Institute](http://www.earth.columbia.edu/articles/view/58) | [Sustainable Engineering Lab](http://sel.columbia.edu/about/)  
-elliot.cohen@columbia.edu | 
-212.854.7993 | Mudd 134F
+**affiliations**  [QMSS](http://qmss.columbia.edu/faculty-and-staff/) | [Earth Institute](http://www.earth.columbia.edu/articles/view/58) | [Sustainable Engineering Lab](http://sel.columbia.edu/about/)  
+**contact**  elliot.cohen@columbia.edu | 212.854.7993  
+**office hours**  Wednesdays 2:30-3:30pm IAB 270C
 
 ## Course Description   
 This course offers a rigorous introduction to data visualization from theory to implementation. Drawing on a combination of lectures, readings, discussions and coding, we will translate the timeless concepts of Minard, Playfair, Tufte and Wilkinson to new and diverse fields of study. Students will receive a coding crash-course in R, JavaScript, CSS, HTML and D3. The goal is not to become computer scientists, but to build the requisite foundation for modern implementation of exploratory and explanatory data visualizations. Students will have the opportunity to work in small teams to create interactive data visualizations worthy of their portfolios. The final deliverable will be a research-driven data visualization with accompanying prose in the form of a conference paper submission. A working knowledge of R from at least one previous class is highly recommended.  
@@ -46,10 +46,11 @@ Students will have the opportunity to work in small teams to create data visuali
 	* text editors
 	* file paths 
 * Working with data in `R` 
-	* [Basic training](http://ecohen4.github.io/data-viz/r/R-tutorial.html)	
+	* [Basic training](http://ecohen4.github.io/data-viz/r/R-tutorial.html)
 	* Data analysis with `plyr`
 	* Data visualization with `ggplot`
 	* Scripting, debugging and writing functions
+	* Reproducible research and dynamic output with [Rmarkdown](http://rmarkdown.rstudio.com/RMarkdownReferenceGuide.pdf)
 * Communicating & sharing your results in the browser
 	* github.io
 	* `HTML`, `CSS`, `JavaScript`

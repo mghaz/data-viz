@@ -1,0 +1,62 @@
+---
+title: "HW1_final"
+author: "Matthew Ghazarian"
+date: "3 Feb 2015"
+output: html_document
+---
+#2015-2-3-MattGhazarian-HW1.html
+
+Setup
+---
+Nuts and bolts from raw files to merged data
+```{r}
+#set wd
+setwd("~/github/data-viz/r")
+#load libraries
+require(plyr)
+#reading and assigning names to csv files
+nmis <- read.csv("Health_Mopup_and_Baseline_NMIS_Facility.csv")
+lgas <- read.csv("lgas.csv")
+#create a subset of the observations in southern provinces
+southern <- lgas[ which(lgas$zone=='Southwest'| lgas$zone=='South-South'| lgas$zone== 'Southeast'), ]
+
+#keep only the data I want from the southern states' data
+mydata <- subset(southern, select = c("state", "pop_2006", "area_sq_km","num_nurses_fulltime", "num_nursemidwives_fulltime", "num_doctors_fulltime"))
+#remove NAs from data
+mydata <- na.omit(mydata)
+```
+
+Compile Crucial Data
+---
+Create dataframe with needed data by state, listed by descending population
+```{r}
+#create dataframe with total nurses, midwives, doctors by state
+mydata2 <- ddply(mydata,.(state), summarise, Nurses = sum(num_nurses_fulltime), Midwives = sum(num_nursemidwives_fulltime), Doctors = sum(num_doctors_fulltime))
+#create a different dataframe of population and area data
+popa <- subset(mydata, select =c("state","pop_2006","area_sq_km"))
+#select the unique values to eliminate repeated values from within same state
+popa2 <- unique(popa)
+#organize popa2 by state name to get dataframe summing up LGA-level data to get state-level data
+popa3<- ddply(popa2,.(state), summarise, Area = sum(area_sq_km), Pop = sum(pop_2006))
+#merge popa2 and mydata2 to get all the data I need listed by state
+allstate <- merge(popa3, mydata2, by = "state")
+```
+
+Display More Data
+---
+Use data in dataframe to add desired info and arrange by population (in descending order)
+``` {r}
+#create a column for total medical personnel
+allstate1 <- transform(allstate, Total.med = Nurses+Midwives+Doctors)
+#order data by state population descending 
+allstate2 <- allstate1[order(-allstate1$Pop),] 
+#add a column with medical professionals per capita by state
+allstate3 <- transform(allstate2, Med.percap = Total.med/Pop)
+#add a column with medical professionals per sq km by state
+allstate4 <-transform(allstate3, Med.per.sqkm = Total.med/Area)
+```
+
+Print results.
+```{r}
+allstate4
+```

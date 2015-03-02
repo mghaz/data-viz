@@ -1,0 +1,80 @@
+---
+title: "HW1_3"
+output: html_document
+===
+Setup
+---
+```
+#check wd is correct 
+getwd()
+#reading and assigning names to csv files
+nmis <- read.csv("Health_Mopup_and_Baseline_NMIS_Facility.csv")
+lgas <- read.csv("lgas.csv")
+#merge the two files by unique_lga to match lga-level data to NMIS facilities data
+merged <- merge(nmis , lgas, by="unique_lga")
+#create a subset of the observations in southern provinces
+southern <- merged[ which(merged$zone=='Southwest'| merged$zone=='South-South'| merged$zone== 'Southeast'), ]
+#keep only the data I want from the southern states' data
+mydata <- subset(southern, select = c("state", "pop_2006", "area_sq_km","num_nurses_fulltime", "num_nursemidwives_fulltime", "num_doctors_fulltime"))
+#remove NAs from data
+mydata <- na.omit(mydata)
+```
+
+Refine Data
+---
+Create dataframe with needed data by state, listed by descending population
+```
+#create dataframe with total nurses, midwives, doctors by state
+allmedstate <- rowsum(mydata[4:6], mydata$state)
+#create a dataframe of population and area data
+popa <- data.frame(pop = mydata$pop_2006, area = mydata$area_sq_km )
+#create a listing by state
+popa <- subset(mydata, select =c("state","pop_2006","area_sq_km"))
+#select the unique values to eliminate repeated values within the same state
+popa2 <- unique(popa)
+#organize popa2 by state name to get dataframe summing up LGA-level data to get state-level data
+popa3<- ddply(popa2,.(state), summarise, Area = sum(area_sq_km), Pop = sum(pop_2006))
+#combine two dataframes to create one with all data (area, pop, and professionals) by state
+allstate <- merge(popas3, allmedstate, )
+```
+
+#Use data in dataframe to add desired info and arrange by population (in descending order)
+```
+#add a column with TOTAL medical professionals by state
+allstate1 <- transform(allmedstate, TOTAL = num_nurses_fulltime+num_nursemidwives_fulltime+num_doctors_fulltime)
+#order data by state population descending 
+allstate2 <- allstate1[order(-allstate1$pop),] 
+#add a column with medical professionals per capita by state
+allstate3 <- transform(allstate2, med_prof_per_capita = TOTAL/pop)
+#add a column with medical professionals per sq km by state
+allstate4 <-transform(allstate3, med_prof_per_sq_km = TOTAL/area)
+#add a column with total nurses (sum of midwives and nurses)
+allstate5 <-transform(allstate4, TOTAL_nurses =  num_nurses_fulltime+num_nursemidwives_fulltime )
+```
+
+
+
+
+
+###
+#create a dataframe of population and area data
+popa <- data.frame(pop = mydata$pop_2006, area = mydata$area_sq_km )
+#create a listing by state
+popastate <-rowsum(popa, mydata$state)
+#create a dataframe with area, pop, and professionals data by state
+allstate <- cbind(popastate, allmedstate)
+
+
+#need to add per capita and per area values. 
+#start here (http://stackoverflow.com/questions/13013231/how-can-i-divide-one-column-of-a-data-frame-through-another) 
+
+
+
+#arrange mydata descending by population of state
+sortmydata <- mydata[order(-mydata$"pop_2006"), ]
+#create a dataframe of all medical personnel
+allmed <- data.frame(nurses =sortmydata$num_nurses_fulltime, midwives = sortmydata$num_nursemidwives_fulltime, doctors = sortmydata$num_doctors_fulltime)
+#arrange the sum of each row of the dataframe by state
+allmedstate <-rowsum(allmed, mydata$state)
+#print total medical professionals per state
+rowSums(allmedstate)

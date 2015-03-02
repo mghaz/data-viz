@@ -1,0 +1,36 @@
+---
+title: "HW1_2"
+output: html_document
+---
+#check wd is correct 
+getwd()
+#reading and assigning names to csv files
+nmis <- read.csv("Health_Mopup_and_Baseline_NMIS_Facility.csv")
+lgas <- read.csv("lgas.csv")
+#merge the two files by unique_lga to match lga-level data to NMIS facilities data
+merged <- merge(nmis , lgas, by="unique_lga")
+#create a subset of the observations in southern provinces
+southern <- merged[ which(merged$zone=='Southwest'| merged$zone=='South-South'| merged$zone== 'Southeast'), ]
+#keep only the data I want from the southern states' data
+mydata <- subset(southern, select = c("state", "pop_2006", "area_sq_km","num_nurses_fulltime", "num_nursemidwives_fulltime", "num_doctors_fulltime"))
+#remove NAs from data
+mydata <- na.omit(mydata)
+#arrange mydata descending by population of state
+sortmydata <- mydata[order(-mydata$"pop_2006"), ]
+
+#path 1
+#calculate the total number of fulltime nurses by state
+margin.table(table(mydata$state, mydata$num_nurses_fulltime), 1)
+#calculate the total number of fulltime doctors by state
+margin.table(table(mydata$state, mydata$num_doctors_fulltime), 1)
+#calculate the total number of fulltime nurse midwives by state 
+margin.table(table(mydata$state, mydata$num_nursemidwives_fulltime), 1)
+
+#path 2
+#create a dataframe of all medical personnel
+allmed <- data.frame(nurses =mydata$num_nurses_fulltime, midwives = mydata$num_nursemidwives_fulltime, doctors = mydata$num_doctors_fulltime)
+#arrange the sum of each row of the dataframe by state
+allmedstate <-rowsum(allmed, mydata$state)
+#print total medical professionals per state
+rowSums(allmedstate)
+

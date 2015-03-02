@@ -1,0 +1,96 @@
+---
+title: "2015-3-2-MattGhazarian-HW2"
+author: "Matthew Ghazarian"
+date: "February 25, 2015"
+output: html_document
+---
+##Setup
+``` {r}
+# require libraries
+require(reshape2)
+require(ggplot2)
+require(plyr)
+require(scales)
+
+# read csv file
+raw.data <- read.csv("Microbe-scope-bugs.csv")
+```
+
+##Cleaning
+```{r}
+#select 5 columns that I need
+mydata <- subset(raw.data, select = c(X, case.fatality.rate, primary.mode.of.transmission, average.basic.reproductive.rate))
+
+#rename colnames using plyr rename function
+df <- rename(mydata, c("X"="name", "case.fatality.rate"="fat","primary.mode.of.transmission"="trans", "average.basic.reproductive.rate"="R0" ))
+
+#erase the row 1 notes and row 2 anthrax (not on the chart because missing values)
+df <- df[3:41, 1:4]
+
+#remove unneeded percentage signs
+df$fat <-gsub( "%", "", paste(df$fat))
+
+#set fatalities percentages as numbers so I can plot them
+df$fat <- as.numeric(df$fat)
+
+#set R0 to numbers -- this needs to be converted from a factor to a character, first, to avoid unwanted changes to the values, since factors are stored as integers
+df$R0 <- as.numeric(as.character(df$R0))
+
+#delete "Malaria (P. falciparum)" because our target project from Information Is Beautful also deleted it (likely because it's an outlier on the R0 scale)
+df <- df[-c(16), ]
+
+#convert trans column from factors to chracters
+df$trans <- as.character(df$trans)
+
+#combine "airborne droplet" and "airborne" categories to match McCandless' graph, which also combines them
+df$trans <-gsub( "airborne droplet", "airborne", paste(df$trans))
+
+#assign "airborne" to cholera, which seems to accidentally have been left blank, but is marked "airborne" in McCandless' map
+df[6,3] <- "airborne"
+```
+
+
+
+
+##Plotting with ggplot 
+Since the first plot is quite messy with overlapping labels, and since I could not figure out how to execute a discontinuous y-axis soon enough, I tried ways to clean up the appearance without the discontinuous scale. Still, jittering techniques, and other methods I attempted could not clean up the overlapping labels before the assignment was due, so I have resorted to creating a second plot for the low-level fatalities. 
+
+In my defense, Hadley Wickham is also hesitant of discontinuous y-axes, as they distort the data. He talks about this topic [here](https://groups.google.com/forum/#!topic/ggplot2/jSrL_FnS8kc)
+```{r}
+#first plot to see what it looks look
+p1 <- ggplot(df, aes(x=R0, y=fat)) + geom_point(position= position_jitter(w = 2, h= 2), aes(color=trans)) +
+  geom_text(aes(label=name, color=trans, size=2.5, angle=30)) +
+  guides(color = guide_legend("Primary transmission method")) + 
+  guides(size=FALSE)
+
+#change x and y axes labels
+p1 <- update_labels(p1, list
+        (x = "Contagiousness (average basic reproduction number, R0)", 
+        y="Deadliness (case fatality rate)"))
+
+#add main title 
+p1 <- p1 + labs(title = "The Microbe-scope (copy)")
+
+#print
+p1
+
+#create dataframe of low level values
+df0 <- subset(df, fat <= 1)
+
+#plot them separately
+p2 <- ggplot(df0, aes(x=R0, y=fat)) +
+  geom_point(position = position_jitter(w = 0.2, h = 0.0), aes(color=trans)) +
+  geom_text(aes(label=name, color=trans, size=2.5, angle=30, vjust=2)) +
+  guides(color = guide_legend("Primary transmission method")) +
+  guides(size=FALSE)
+
+#provide new title and change labels
+p2 <- update_labels(p2, list
+        (x = "Contagiousness (average basic reproduction number, R0)", 
+        y="Deadliness (case fatality rate)"))
+p2 <- p2 + labs(title = "The Microbe-scope (copy), low-fatality cases")
+
+#print
+p2                 
+```
+

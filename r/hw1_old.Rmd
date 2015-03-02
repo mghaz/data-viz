@@ -1,0 +1,18 @@
+---
+title: "HW1_2"
+output: html_document
+---
+```
+#reading and assigning names to csv files
+nmis <- read.csv("Health_Mopup_and_Baseline_NMIS_Facility.csv")
+lgas <- read.csv("lgas.csv")
+#merge the two files by unique_lga to match lga-level data to NMIS facilities data
+merged <- merge(nmis , lgas, by="unique_lga")
+#create a subset of the observations in southern provinces
+#create a data.frame of fulltime nurses called ftnurses
+ftnurses <- data.frame((nurses = southern$num_nurses_fulltime), (state = southern$state) )
+#create a data.frame of fulltime doctors called ftdoctors
+ftdoctors <- data.frame((doctors = southern$num_doctors_fulltime), (state = southern$state) )
+#there is a problem because when I ask for a summary of ftnurses or ftdoctors, 
+#I recieve the same values for the states, but the means are different
+```

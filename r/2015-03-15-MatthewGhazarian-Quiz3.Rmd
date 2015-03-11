@@ -1,0 +1,14 @@
+---
+title: "2015-03-11-MatthewGHazarian-Quiz3"
+author: "Matthew Ghazarian"
+date: "March 11, 2015"
+output: html_document
+---
+ 
+ month_timeseries <- function (a) { 
+    a <- subset(airquality, Month == a, select = c(Day, Temp) )
+    b <- plot(a)
+    return (b)
+  }
+
+month_timeseries(5)
